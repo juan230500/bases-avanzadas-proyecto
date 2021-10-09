@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "email": "test@",
+      "password": "pass",
+      "name": "TEST",
+      "country": "country test",
+      "titles": ["title1", "title2"],
+      "programmingLanguages": ["c++", "c"],
+      "languages": [
+        { "name": "ingles", "level": "básico" },
+        { "name": "frances", "level": "intermedio" }
+      ]
+    }
+  ],
+  "fields": {
+    "email": { "label": "Correo electrónico ", "type": "basic" },
+    "password": { "label": "Clave de acceso", "type": "basic" },
+    "name": { "label": "Nombre completo", "type": "basic" },
+    "country": { "label": "País de residencia", "type": "basic" },
+    "titles": { "label": "Títulos universitarios", "type": "list" },
+    "programmingLanguages": {
+      "label": "Lenguajes de programación que conoce",
+      "type": "list"
+    },
+    "languages": { "label": "Idiomas", "type": "list" }
+  }
+}

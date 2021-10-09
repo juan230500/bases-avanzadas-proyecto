@@ -1,0 +1,9 @@
+.Item {
+  display: inline-flex;
+  padding: 4px 12px;
+  align-items: center;
+  border-radius: 80px;
+  border: 1px solid black;
+  margin: 4px;
+  cursor: pointer;
+}
