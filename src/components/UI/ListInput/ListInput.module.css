@@ -7,3 +7,13 @@
   margin: 4px;
   cursor: pointer;
 }
+
+.Container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.Container * {
+  flex: 1;
+}

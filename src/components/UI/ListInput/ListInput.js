@@ -4,35 +4,62 @@ import classes from "./ListInput.module.css";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 const ListInput = (props) => {
-  const [val, setVal] = useState("");
+  const [val, setVal] = useState(props.schema || "");
 
   const add = () => {
     if (!val) return;
-    const newList = [...props.list];
+    const newList = [...props.value];
     newList.push(val);
     props.onChange(newList);
-    setVal("");
+    setVal(props.schema || "");
   };
 
   const del = (i) => {
-    const newList = [...props.list];
+    const newList = [...props.value];
     newList.splice(i, 1);
     props.onChange(newList);
   };
 
-  return (
-    <div>
+  let input = null;
+  if (props.schema) {
+    input = Object.keys(props.schema).map((k) => (
+      <TextField
+        value={val[k]}
+        onChange={(e) => {
+          const newVal = { ...val };
+          newVal[k] = e.target.value;
+          setVal(newVal);
+        }}
+        label={k}
+        variant="standard"
+      />
+    ));
+  } else {
+    input = (
       <TextField
         value={val}
         onChange={(e) => setVal(e.target.value)}
         label={props.label}
         variant="standard"
       />
-      <Button onClick={add}>Agregar</Button>
-      <div>
-        {props.list?.map((el, i) => (
+    );
+  }
+
+  return (
+    <div className={classes.Container}>
+      {input}
+      <Button style={{ flex: "unset" }} onClick={add}>
+        Agregar
+      </Button>
+      <div style={{ flex: "100%" }}>
+        {props.value?.map((el, i) => (
           <li className={classes.Item} onClick={() => del(i)}>
-            {el} <DeleteIcon />
+            {typeof el === "string"
+              ? el
+              : Object.keys(el)
+                  .map((k) => `${k}:${el[k]}`)
+                  .join(", ")}{" "}
+            <DeleteIcon />
           </li>
         ))}
       </div>
