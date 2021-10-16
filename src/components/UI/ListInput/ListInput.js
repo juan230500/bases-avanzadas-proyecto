@@ -1,10 +1,14 @@
 import { Button, TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./ListInput.module.css";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 const ListInput = (props) => {
   const [val, setVal] = useState(props.schema || "");
+
+  useEffect(() => {
+    setVal(props.schema || "");
+  }, [props.schema]);
 
   const add = () => {
     if (!val) return;
@@ -57,6 +61,7 @@ const ListInput = (props) => {
             {typeof el === "string"
               ? el
               : Object.keys(el)
+                  .filter((k) => k !== "_id")
                   .map((k) => `${k}:${el[k]}`)
                   .join(", ")}{" "}
             <DeleteIcon />

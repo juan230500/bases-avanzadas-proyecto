@@ -6,17 +6,25 @@ import { Button, Checkbox, FormControlLabel } from "@mui/material";
 import { Link, useHistory } from "react-router-dom";
 import ListInput from "../UI/ListInput/ListInput";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const Register = (props) => {
+  const history = useHistory();
   const [data, setData] = useState({});
 
-  useEffect(() => {
+  const getUser = async () => {
     const newData = { ...json.fields };
+    const res = await axios.get(props.url + "/GetUser/" + props.userId);
+    console.log(res.data);
+    Object.keys(json.fields).forEach((k) => (newData[k].value = res.data[k]));
+    setData(newData);
+  };
+
+  useEffect(() => {
     if (props.userId) {
-      const res = json.data[0];
-      console.log("TEST");
-      Object.keys(json.fields).forEach((k) => (newData[k].value = res[k]));
+      getUser();
     } else {
+      const newData = { ...json.fields };
       Object.keys(json.fields).forEach(
         (k) =>
           (newData[k].value =
@@ -26,8 +34,8 @@ const Register = (props) => {
               ? false
               : [])
       );
+      setData(newData);
     }
-    setData(newData);
   }, [props.userId]);
 
   const update = (k, v) => {
@@ -38,46 +46,68 @@ const Register = (props) => {
 
   const check = () => {
     for (let k in data) {
+      if (k === "programmingLanguages" && !data.ITarea.value) {
+        continue;
+      }
       if (data[k].value.length <= 0) {
         toast.warning("Falta llenar el campo: " + data[k].label);
         return false;
       }
     }
-    toast.success("Se está procesando su solicitud");
+
     return true;
   };
 
-  const register = () => {
+  const register = async () => {
     const result = {};
-    check();
+    if (!check()) return;
     Object.keys(data).forEach((k) => (result[k] = data[k].value));
-    console.log(result);
-    props.setUserId("AAA");
+
+    const id = toast.info("Se está procesando su solicitud");
+    const res = await axios.post(props.url + "/Register", result);
+    console.log(res);
+    toast.dismiss(id);
+    if (res.data === "Recibido") {
+      toast.success("Recibido");
+      props.setUserId(result.email);
+    }
   };
 
-  const edit = () => {
+  const edit = async () => {
     const result = {};
-    check();
+    if (!check()) return;
     Object.keys(data).forEach((k) => (result[k] = data[k].value));
-    console.log(result);
+
+    const id = toast.info("Se está procesando su solicitud");
+
+    const res = await axios.put(props.url + "/Put/" + result.email, result);
+    console.log(result, res);
+    toast.dismiss(id);
+    if (res.data === "El dato ha sido modificado") {
+      toast.success("El dato ha sido modificado");
+      props.setUserId(result.email);
+    }
   };
 
   const cancel = () => {
+    toast.success("Sesión cerrado con éxito");
     props.setUserId(null);
+    history.push("/login");
   };
 
   const setup = props.userId
-    ? { title: "Editar datos", btns: { Editar: edit, Cancelar: cancel } }
+    ? { title: "Editar datos", btns: { Editar: edit, "Cerrar sesión": cancel } }
     : { title: "Registro", btns: { Registrar: register } };
 
   return (
     <div className={classes.Register}>
       <h1>{setup.title}</h1>
       {Object.keys(data)
-        .filter((el) => el !== "programmingLanguages" || data.TI.value)
+        .filter((el) => el !== "programmingLanguages" || data.ITarea.value)
         .map((k) =>
           data[k].type === "basic" ? (
             <TextField
+              disabled={k === "email" && props.userId}
               type={k}
               key={k}
               label={data[k].label}

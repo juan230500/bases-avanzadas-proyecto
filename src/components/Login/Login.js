@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const Login = (props) => {
   const history = useHistory();
@@ -26,17 +27,29 @@ const Login = (props) => {
         return false;
       }
     }
-    toast.success("Se está procesando su solicitud");
+
     return true;
   };
 
-  const send = () => {
+  const send = async () => {
+    if (!check()) return;
+
     const result = {};
-    check();
     Object.keys(data).forEach((k) => (result[k] = data[k].value));
-    console.log(result);
-    props.setUserId("AAA");
-    history.push("/register");
+    const id = toast.info("Se está procesando su solicitud");
+    const res = await axios.post(props.url + "/Login", result);
+
+    toast.dismiss(id);
+    if (res.data === "Usuario no encontrado") {
+      toast.error("Usuario no encontrado");
+    } else if (res.data === "Bienvedo RH") {
+      history.push("/info");
+      toast.success("Bienvedo RH");
+    } else if (res.data === "Bienvedo Usuario") {
+      toast.success("Bienvedo Usuario");
+      props.setUserId(result.email);
+      history.push("/register");
+    }
   };
 
   return (
